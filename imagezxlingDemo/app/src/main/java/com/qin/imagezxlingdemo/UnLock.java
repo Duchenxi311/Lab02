@@ -9,29 +9,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class UnLock extends Activity implements View.OnClickListener, LocusPassWordView.OnCompleteListener {
+public class UnLock extends Activity implements View.OnClickListener, UnlockView.OnCompleteListener {
 
     private TextView mExplainTv;
     private Button mConfirmBtn;
-    private LocusPassWordView mPwdView;
+    private UnlockView mPwdView;
 
-    private String UnLockPassword;
-    String password;
-    private boolean isFirst;
+    //private String UnLockPassword;
+    int clicknum = 0;
+    //private boolean isFirst;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_un_lock);
-        Intent i = getIntent();
-        password = i.getStringExtra("password");
         initViews();
     }
 
     private void initViews() {
         mExplainTv = (TextView) findViewById(R.id.tv_explain_unlock);
         mConfirmBtn = (Button) findViewById(R.id.btn_confirm_unlock);
-        mPwdView = (LocusPassWordView) findViewById(R.id.mPassWordView_unlock);
+        mPwdView = (UnlockView) findViewById(R.id.mPassWordView_unlock);
 
         mConfirmBtn.setOnClickListener(this);
         mPwdView.setOnCompleteListener(this);
@@ -42,23 +40,34 @@ public class UnLock extends Activity implements View.OnClickListener, LocusPassW
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_confirm_unlock:
-                confirm(UnLockPassword);
+                confirm();
                 break;
         }
     }
 
-    private void confirm(String Unlockpassword) {
-        if(Unlockpassword.equals(password))
-            Toast.makeText(UnLock.this,"success", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(UnLock.this,"try again", Toast.LENGTH_SHORT).show();
+    private void confirm() {
+        if (mPwdView.getFirstPassword().equals(MainActivity.againPassword)) {
+            if(clicknum == 0) {
+                onPrompt("解锁成功");
+                mPwdView.disableTouch();
+                mConfirmBtn.setText("退出");
+                //Toast.makeText(UnLock.this, "success", Toast.LENGTH_SHORT).show();
+                clicknum += 1;
+            }else{
+                onPrompt("成功退出");
+                Toast.makeText(UnLock.this, "成功退出", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            onPrompt("密码错误，请重试");
+            //Toast.makeText(UnLock.this, "try again", Toast.LENGTH_SHORT).show();
+        }
     }
+
+
 
     @Override
     public void onComplete(String password) {
-        if (isFirst) {
-            firstChoose(password);
-        }
+        firstChoose(password);
     }
 
     @Override
@@ -67,18 +76,15 @@ public class UnLock extends Activity implements View.OnClickListener, LocusPassW
     }
 
     private void initChoose() {
-        isFirst = true;
-        UnLockPassword = "";
         mPwdView.setFirstPassword("");
         mConfirmBtn.setVisibility(View.GONE);
     }
 
     private void firstChoose(String password) {
-        isFirst = false;
         mPwdView.setFirstPassword(password);
         mPwdView.clearPassword(0);
         mConfirmBtn.setEnabled(true);
-        UnLockPassword = password;
         mConfirmBtn.setVisibility(View.VISIBLE);
     }
 }
+

@@ -32,7 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Locu
     private LocusPassWordView mPwdView;
 
     private String firstPassword;
-    private String againPassword;
+    public static String againPassword;
 
     private boolean isFirst;
 
